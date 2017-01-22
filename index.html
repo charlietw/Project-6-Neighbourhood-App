@@ -17,9 +17,9 @@
             </div>
 
             <div>
-                <ul data-bind="foreach: markers">
+                <ul data-bind="foreach: markerList">
                     <li>
-                        <span data-bind="text: addresstitle"></span>
+                        <span data-bind="text: addresstitle, click: $parent.toggleActive"></span>
                     </li>
                 </ul>
             </div>

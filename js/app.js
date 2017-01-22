@@ -15,11 +15,20 @@ var markers = [
 
 var ViewModel = function(){
 
-    var self=this;
-    this.markerList = []
+    var self = this;
+
+    this.markerList = ko.observableArray([])
+
     markers.forEach(function(marker){
         self.markerList.push(marker);
     });
+
+    self.activeMarker = ko.observable(this.markerList()[0]);
+
+    self.toggleActive = function(clickedMarker){
+        self.activeMarker(clickedMarker)
+        console.log(self.activeMarker());
+    }
 
     // this.addMarker = function(marker){
     //     self.markerList.push(marker);
