@@ -1,17 +1,21 @@
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
 #map {
-    height: 100%;
-    position: relative;
-    padding-bottom: 100%; /* Ratio 16:9 ( 100%/16*9 = 56.25% ) */
+    height: 800px;
+/*    position: relative;*/
+/*    padding-bottom: 50%;*/  /*Ratio 16:9 ( 100%/16*9 = 56.25% )*/
 }
 
-.placesList {
-    height: 100%;
+#placesList {
+    height: 800px;
     color: white;
-    background-color: black;
-    position: relative;
-    padding-bottom: 100%;
+    padding-left: 50px;
+/*    position: relative;*/
+/*    padding-bottom: 50%;*/
+}
+
+.blackBackground {
+    background-color: rgb(53, 55, 61);
 }
 /* Optional: Makes the sample page fill the window. */
 /*html, body {

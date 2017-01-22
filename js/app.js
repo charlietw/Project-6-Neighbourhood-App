@@ -1,4 +1,4 @@
-
+// Initiate global variable as needs to be accessed by multiple things.
 var markers = ko.observableArray([]);
 
 
@@ -30,24 +30,8 @@ function populateMarkers(markers){
     })
 }
 
-// markers([
-//     {
-//         name: "32 Field Lane, Letchworth Garden City",
-//         contentstring: "The oooold house of me mam"
-//     },
-//     {
-//         name: "Fairfield Hall, Stotfold",
-//         contentstring: "The nnnnewwww house of me."
-//     },
-//     {
-//         name: "Lamex Stadium, Stevenage",
-//         contentstring: "BORO!!"
-//     },
-// ])
-
 var ViewModel = function(){
     var self = this;
-
     populateMarkers(markers);
 
     self.markerList = ko.observableArray([])
@@ -56,11 +40,14 @@ var ViewModel = function(){
         createGoogleMapMarker(map,clickedObject);
     }
 
-    markers().forEach(function(marker){
-        var googleMarker = createGoogleMapMarker(map, marker);
-        console.log("function called")
-        self.markerList.push(marker);
-    });
+    self.addAllMarkers = function(){
+        console.log(markers())
+        markers().forEach(function(marker){
+            createGoogleMapMarker(map, marker);
+            console.log("function called")
+            // self.markerList.push(marker);
+        });
+    };
 
     self.activeMarker = ko.observable(this.markerList()[0]);
 

@@ -4,37 +4,42 @@
         <title>Simple Map</title>
         <meta name="viewport" content="initial-scale=1.0">
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
         <div id="container">
-<!--             <div>
-                <form>
-                    <input type="text" id="location" value="Newcastle Upon Tyne">
-                    <button type="button" id="submit">Geocode</button>
-                </form>
-            </div> -->
         <div class="row">
-            <div class="col-sm-2 placesList">
+            <div class="col-lg-3 blackBackground" id="placesList">
                 <h3 id="locationHeader">Select a location:</h3>
+                <div class="dropdown blackBackground">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Cuisine
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Chinese</a></li>
+                        <li><a href="#">Indian</a></li>
+                        <li><a href="#">Pizza</a></li>
+                    </ul>
+                </div>
                 <ul data-bind="foreach: markers">
                     <li>
-                        <span data-bind="text: name, click: $parent.testFunc"></span>
+                        <span data-bind="text: name, click: $parent.addAllMarkers"></span>
                     </li>
                 </ul>
             </div>
-
-            <div id="map" class="col-sm-10">
+            <div id="map" class="col-lg-9">
             </div>
         </div>
 
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjy3D1w466JIWeKUi8nZcT1oH6dBPLt4c&callback=init"
-            async defer>
-            </script>
-            <script src="js/lib/knockout-3.2.0.js"></script>
-            <script src="js/lib/jquery.min.js"></script>
-            <script src="js/app.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjy3D1w466JIWeKUi8nZcT1oH6dBPLt4c&callback=init"
+        async defer>
+        </script>
+
+        <script src="js/lib/knockout-3.2.0.js"></script>
+        <script src="js/lib/jquery.min.js"></script>
+        <script src="js/lib/bootstrap.min.js"></script>
+        <script src="js/app.js"></script>
+
         </div>
 
     </body>
