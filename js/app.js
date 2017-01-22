@@ -1,45 +1,75 @@
-var markers = [
-    {
-        addresstitle: "32 Field Lane, Letchworth Garden City",
-        contentstring: "The oooold house of me mam"
-    },
-    {
-        addresstitle: "Fairfield Hall, Stotfold",
-        contentstring: "The nnnnewwww house of me."
-    },
-    {
-        addresstitle: "Lamex Stadium, Stevenage",
-        contentstring: "BORO!!"
-    },
-]
+
+var markers = ko.observableArray([]);
+
+
+var fourSquareCreds = {
+    client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
+    client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
+    version: 20170101
+};
+
+var foursquareurl = "https://api.foursquare.com/v2/venues/search?client_id="+
+                    fourSquareCreds.client_id+"&client_secret="+
+                    fourSquareCreds.client_secret+"&near=Letchworth,UK&query=Chinese&v="+
+                    fourSquareCreds.version+"20170101&m=foursquare";
+
+// Retrieves markers for Chinese restaurants near Letchworth.
+function populateMarkers(markers){
+    $.getJSON(foursquareurl, function(data) {
+        $.each(data.response.venues, function(){
+            // Adds an attribute for Google Maps to place the position.
+            this.LatLng = {
+                            lat: this.location.lat,
+                            lng: this.location.lng
+                        };
+            markers.push(this);
+        });
+    }).error(function(){
+        $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
+        console.log("Something went wrong with getting the markers from foursquare")
+    })
+}
+
+// markers([
+//     {
+//         name: "32 Field Lane, Letchworth Garden City",
+//         contentstring: "The oooold house of me mam"
+//     },
+//     {
+//         name: "Fairfield Hall, Stotfold",
+//         contentstring: "The nnnnewwww house of me."
+//     },
+//     {
+//         name: "Lamex Stadium, Stevenage",
+//         contentstring: "BORO!!"
+//     },
+// ])
 
 var ViewModel = function(){
-
     var self = this;
 
-    this.markerList = ko.observableArray([])
+    populateMarkers(markers);
 
-    markers.forEach(function(marker){
+    self.markerList = ko.observableArray([])
+
+    self.testFunc = function(clickedObject){
+        createGoogleMapMarker(map,clickedObject);
+    }
+
+    markers().forEach(function(marker){
+        var googleMarker = createGoogleMapMarker(map, marker);
+        console.log("function called")
         self.markerList.push(marker);
     });
 
     self.activeMarker = ko.observable(this.markerList()[0]);
 
     self.toggleActive = function(clickedMarker){
+        markerClick(clickedMarker)
         self.activeMarker(clickedMarker)
-        console.log(self.activeMarker());
     }
-
-    // this.addMarker = function(marker){
-    //     self.markerList.push(marker);
-    //     console.log(self.markerList)
-    // };
-
 };
 
-
-
-// console.log(ViewModel().addMarker())
 
 // var Cat = function(data){
 //     this.name = ko.observable(data.name);
@@ -88,7 +118,7 @@ var ViewModel = function(){
 
 
 
-ko.applyBindings(new ViewModel());
+
 
 //Handling Google Maps API seprately as per the rubric.
 var map, marker, geocoder;
@@ -96,34 +126,35 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 10
     });
-    geocoder = new google.maps.Geocoder();
+    map.setCenter({lat:0, lng:0})
     //Takes the array of addresses and makes them markers that Google Maps can read
-    markers.forEach(function(marker){
-        createGoogleMapMarker(geocoder, map, marker)
-    })
+    // markers.forEach(function(marker){
+    //     createGoogleMapMarker(map, marker)
+    // })
 };
 
-function createGoogleMapMarker(geocoder, map, addressmarker){
-    geocoder.geocode( { 'address': addressmarker.addresstitle}, function(results, status) {
-      if (status == 'OK') {
-        map.setCenter(results[0].geometry.location);
-        var marker = new google.maps.Marker({
-            map: map,
-            position: results[0].geometry.location,
-            animation: google.maps.Animation.DROP,
-            addresstitle: addressmarker.addresstitle,
-            InfoWindow: new google.maps.InfoWindow({
-                content: addressmarker.contentstring
-            })
-        });
-        marker.addListener('click', markerClick)
-      } else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  }
+function createGoogleMapMarker(map, addressmarker){
+    console.log(addressmarker.LatLng)
+    // geocoder = new google.maps.Geocoder();
+    // geocoder.geocode( { 'address': addressmarker.name}, function(results, status) {
+    //   if (status == 'OK') {
+    //     map.setCenter(results[0].geometry.location);
+    // console.log("test")
+    var marker = new google.maps.Marker({
+        map: map,
+        position: addressmarker.LatLng,
+        animation: google.maps.Animation.DROP,
+        addresstitle: addressmarker.name,
+        InfoWindow: new google.maps.InfoWindow({
+            content: addressmarker.name
+        })
+    })
+    map.setCenter(addressmarker.LatLng);
+    marker.addListener('click', markerClick);
+    console.log(marker);
+    };
 
-function markerClick() {
+function markerClick(clickedMarker) {
         if (this.getAnimation() !== null) {
             this.setAnimation(null);
         }
@@ -134,7 +165,7 @@ function markerClick() {
         console.log(this.addresstitle+" has been clicked.")
     }
 
-
-// var geocoder = new google.maps.Geocoder();
-// var mapreturn = geocoder.geocode({"address":"32 Field Lane, Letchworth Garden City"})
-// console.log(mapreturn)
+var init = function(){
+    initMap();
+    ko.applyBindings(new ViewModel());
+    }
