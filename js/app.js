@@ -1,4 +1,4 @@
-// Initiate global variable as needs to be accessed by multiple things.
+// Model variables
 var markers = ko.observableArray([]);
 var cuisineOptions = ["Indian", "Chinese", "Pizza"]
 
@@ -14,7 +14,7 @@ var foursquareurl = ko.observable( "https://api.foursquare.com/v2/venues/search?
                     fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+fourSquareCreds().query+"&v="+
                     fourSquareCreds().version+"20170101&m=foursquare");
 
-// Retrieves markers for Chinese restaurants near Letchworth.
+// Retrieves markers for Chinese restaurants near Letchworth. CHANGE TO BE IN VIEWMODEL!
 function populateMarkers(markers){
     $.getJSON(foursquareurl(), function(data) {
         $.each(data.response.venues, function(){
