@@ -1,21 +1,22 @@
 // Initiate global variable as needs to be accessed by multiple things.
 var markers = ko.observableArray([]);
+var cuisineOptions = ["Indian", "Chinese", "Pizza"]
 
-
-var fourSquareCreds = {
+var fourSquareCreds = ko.observable( {
     client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
     client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
-    version: 20170101
-};
-
-var foursquareurl = "https://api.foursquare.com/v2/venues/search?client_id="+
-                    fourSquareCreds.client_id+"&client_secret="+
-                    fourSquareCreds.client_secret+"&near=Letchworth,UK&query=Chinese&v="+
-                    fourSquareCreds.version+"20170101&m=foursquare";
+    version: 20170101,
+    query: "chinese"
+});
+//Current problem - this isn't refreshing!!
+var foursquareurl = ko.observable( "https://api.foursquare.com/v2/venues/search?client_id="+
+                    fourSquareCreds().client_id+"&client_secret="+
+                    fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+fourSquareCreds().query+"&v="+
+                    fourSquareCreds().version+"20170101&m=foursquare");
 
 // Retrieves markers for Chinese restaurants near Letchworth.
 function populateMarkers(markers){
-    $.getJSON(foursquareurl, function(data) {
+    $.getJSON(foursquareurl(), function(data) {
         $.each(data.response.venues, function(){
             // Adds an attribute for Google Maps to place the position.
             this.LatLng = {
@@ -37,14 +38,15 @@ var ViewModel = function(){
     self.markerList = ko.observableArray([])
 
     self.testFunc = function(clickedObject){
-        createGoogleMapMarker(map,clickedObject);
+        fourSquareCreds.query = clickedObject
+        console.log(fourSquareCreds.query)
     }
 
-    self.addAllMarkers = function(){
+    self.addAllMarkers = function(clickedObject){
+        console.log(clickedObject)
         console.log(markers())
         markers().forEach(function(marker){
             createGoogleMapMarker(map, marker);
-            console.log("function called")
             // self.markerList.push(marker);
         });
     };
@@ -121,7 +123,6 @@ function initMap() {
 };
 
 function createGoogleMapMarker(map, addressmarker){
-    console.log(addressmarker.LatLng)
     // geocoder = new google.maps.Geocoder();
     // geocoder.geocode( { 'address': addressmarker.name}, function(results, status) {
     //   if (status == 'OK') {
@@ -138,7 +139,6 @@ function createGoogleMapMarker(map, addressmarker){
     })
     map.setCenter(addressmarker.LatLng);
     marker.addListener('click', markerClick);
-    console.log(marker);
     };
 
 function markerClick(clickedMarker) {

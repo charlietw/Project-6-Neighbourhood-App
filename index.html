@@ -15,10 +15,10 @@
                 <div class="dropdown blackBackground">
                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Cuisine
                     <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Chinese</a></li>
-                        <li><a href="#">Indian</a></li>
-                        <li><a href="#">Pizza</a></li>
+                    <ul class="dropdown-menu" data-bind="foreach: cuisineOptions">
+                        <li>
+                            <a href="#" data-bind="text: $data, click: $parent.testFunc"></a>
+                        </li>
                     </ul>
                 </div>
                 <ul data-bind="foreach: markers">
