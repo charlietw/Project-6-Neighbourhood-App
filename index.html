@@ -11,10 +11,19 @@
         <div id="container">
             <div>
                 <form>
-                    <input type="text" id="location">
+                    <input type="text" id="location" value="Newcastle Upon Tyne">
                     <button type="button" id="submit">Geocode</button>
                 </form>
             </div>
+
+            <div>
+                <ul data-bind="foreach: markers">
+                    <li>
+                        <span data-bind="text: addresstitle"></span>
+                    </li>
+                </ul>
+            </div>
+
             <div id="map" class="col-md-12">
             </div>
 

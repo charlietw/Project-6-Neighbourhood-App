@@ -1,7 +1,27 @@
+var markers = [
+    {addresstitle: "32 Field Lane, Letchworth Garden City"},
+    {addresstitle: "Fairfield Hall, Stotfold"},
+    {addresstitle: "Lamex Stadium, Stevenage"},
+]
+
 var ViewModel = function(){
-    this.googleMapsAPIKey = ko.observable("AIzaSyAjy3D1w466JIWeKUi8nZcT1oH6dBPLt4c");
-    this.googleMapsURL = ko.observable("https://maps.googleapis.com/maps/api/js?key="+this.googleMapsAPIKey()+"&callback=initMap");
+
+    var self=this;
+    this.markerList = []
+    markers.forEach(function(marker){
+        self.markerList.push(marker);
+    });
+
+    // this.addMarker = function(marker){
+    //     self.markerList.push(marker);
+    //     console.log(self.markerList)
+    // };
+
 };
+
+
+
+// console.log(ViewModel().addMarker())
 
 // var Cat = function(data){
 //     this.name = ko.observable(data.name);
@@ -65,21 +85,27 @@ function initMap() {
     //     map: map
     // });
     geocoder = new google.maps.Geocoder();
-    document.getElementById('submit').addEventListener('click', function() {
-            geocodeAddress(geocoder, map);
-        });
+    markers.forEach(function(marker){
+        geocodeAddress(geocoder, map, marker.addresstitle)
+    })
 };
 
-function geocodeAddress(geocoder, map){
-    var address = document.getElementById('location').value;
-    console.log(geocoder);
+function geocodeAddress(geocoder, map, address){
+    // var address = document.getElementById('location').value;
     geocoder.geocode( { 'address': address}, function(results, status) {
       if (status == 'OK') {
         map.setCenter(results[0].geometry.location);
         var marker = new google.maps.Marker({
             map: map,
-            position: results[0].geometry.location
+            position: results[0].geometry.location,
+            addresstitle: address
         });
+        marker.addListener('click', function() {
+            map.setCenter(marker.getPosition());
+            console.log(marker.addresstitle+" has been clicked.")
+        });
+
+        markers.push(marker)
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }
