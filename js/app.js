@@ -98,12 +98,15 @@ function geocodeAddress(geocoder, map, address){
         var marker = new google.maps.Marker({
             map: map,
             position: results[0].geometry.location,
+            animation: google.maps.Animation.DROP,
             addresstitle: address
         });
-        marker.addListener('click', function() {
-            map.setCenter(marker.getPosition());
-            console.log(marker.addresstitle+" has been clicked.")
-        });
+        marker.addListener('click', markerClick)
+        //     // map.setCenter(marker.getPosition());
+        //     toggleBounce(marker);
+        //     console.log(marker.addresstitle+" has been clicked.")
+        // });
+
 
         markers.push(marker)
       } else {
@@ -111,6 +114,17 @@ function geocodeAddress(geocoder, map, address){
       }
     });
   }
+
+function markerClick() {
+        if (this.getAnimation() !== null) {
+            this.setAnimation(null);
+        }
+        else {
+          this.setAnimation(google.maps.Animation.BOUNCE);
+        }
+        console.log(this.addresstitle+" has been clicked.")
+    }
+
 
 // var geocoder = new google.maps.Geocoder();
 // var mapreturn = geocoder.geocode({"address":"32 Field Lane, Letchworth Garden City"})
