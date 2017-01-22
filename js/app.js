@@ -1,7 +1,16 @@
 var markers = [
-    {addresstitle: "32 Field Lane, Letchworth Garden City"},
-    {addresstitle: "Fairfield Hall, Stotfold"},
-    {addresstitle: "Lamex Stadium, Stevenage"},
+    {
+        addresstitle: "32 Field Lane, Letchworth Garden City",
+        contentstring: "The oooold house of me mam"
+    },
+    {
+        addresstitle: "Fairfield Hall, Stotfold",
+        contentstring: "The nnnnewwww house of me."
+    },
+    {
+        addresstitle: "Lamex Stadium, Stevenage",
+        contentstring: "BORO!!"
+    },
 ]
 
 var ViewModel = function(){
@@ -73,42 +82,32 @@ var ViewModel = function(){
 ko.applyBindings(new ViewModel());
 
 //Handling Google Maps API seprately as per the rubric.
-var map, uluru, marker, geocoder;
+var map, marker, geocoder;
 function initMap() {
-    uluru = {lat: -34.397, lng: 150.644}
     map = new google.maps.Map(document.getElementById('map'), {
-        center: uluru,
-        zoom: 8
+        zoom: 10
     });
-    // marker = new google.maps.Marker({
-    //     position: uluru,
-    //     map: map
-    // });
     geocoder = new google.maps.Geocoder();
+    //Takes the array of addresses and makes them markers that Google Maps can read
     markers.forEach(function(marker){
-        geocodeAddress(geocoder, map, marker.addresstitle)
+        createGoogleMapMarker(geocoder, map, marker)
     })
 };
 
-function geocodeAddress(geocoder, map, address){
-    // var address = document.getElementById('location').value;
-    geocoder.geocode( { 'address': address}, function(results, status) {
+function createGoogleMapMarker(geocoder, map, addressmarker){
+    geocoder.geocode( { 'address': addressmarker.addresstitle}, function(results, status) {
       if (status == 'OK') {
         map.setCenter(results[0].geometry.location);
         var marker = new google.maps.Marker({
             map: map,
             position: results[0].geometry.location,
             animation: google.maps.Animation.DROP,
-            addresstitle: address
+            addresstitle: addressmarker.addresstitle,
+            InfoWindow: new google.maps.InfoWindow({
+                content: addressmarker.contentstring
+            })
         });
         marker.addListener('click', markerClick)
-        //     // map.setCenter(marker.getPosition());
-        //     toggleBounce(marker);
-        //     console.log(marker.addresstitle+" has been clicked.")
-        // });
-
-
-        markers.push(marker)
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }
@@ -122,6 +121,7 @@ function markerClick() {
         else {
           this.setAnimation(google.maps.Animation.BOUNCE);
         }
+        this.InfoWindow.open(map, this)
         console.log(this.addresstitle+" has been clicked.")
     }
 
