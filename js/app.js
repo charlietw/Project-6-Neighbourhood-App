@@ -1,5 +1,14 @@
 // Model variables
-var markers = ko.observableArray([]);
+var GoogleMarker = function(data){
+    //console.log(data.name)
+    this.name = ko.observable(data.name);
+    this.position = ko.observable(data.position);
+}
+
+//var markers = ko.observableArray([]);
+
+//var googleMarkers = ko.observableArray([]);
+
 var cuisineOptions = ["Indian", "Chinese", "Pizza"]
 
 var fourSquareCreds = ko.observable( {
@@ -14,44 +23,51 @@ var foursquareurl = ko.observable( "https://api.foursquare.com/v2/venues/search?
                     fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+fourSquareCreds().query+"&v="+
                     fourSquareCreds().version+"20170101&m=foursquare");
 
-// Retrieves markers for Chinese restaurants near Letchworth. CHANGE TO BE IN VIEWMODEL!
-function populateMarkers(markers){
-    $.getJSON(foursquareurl(), function(data) {
-        $.each(data.response.venues, function(){
-            // Adds an attribute for Google Maps to place the position.
-            this.LatLng = {
-                            lat: this.location.lat,
-                            lng: this.location.lng
-                        };
-            markers.push(this);
-        });
-    }).error(function(){
-        $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
-        console.log("Something went wrong with getting the markers from foursquare")
-    })
-}
 
 var ViewModel = function(){
     var self = this;
-    populateMarkers(markers);
 
-    self.markerList = ko.observableArray([])
+    self.googleMarkers = ko.observableArray([]);
+
+    //Used to be a function - still could be? Retrieves markers for Chinese restaurants near Letchworth.
+    //this.fourSquareMarkers = function(){
+        $.getJSON(foursquareurl(), function(data) {
+            $.each(data.response.venues, function(){
+                // Adds an attribute for Google Maps to place the position.
+                this.position = {
+                                lat: this.location.lat,
+                                lng: this.location.lng
+                            };
+                self.googleMarkers.push(this);
+                createGoogleMapMarker(map, this);
+                });
+            }).error(function(){
+                $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
+                console.log("Something went wrong with getting the markers from foursquare.")
+        });
+        //};
+    //self.fourSquareMarkers()
+
+
+    self.googleMarkers().forEach(function(marker){
+            createGoogleMapMarker(map, marker);
+        });
 
     self.testFunc = function(clickedObject){
         fourSquareCreds.query = clickedObject
         console.log(fourSquareCreds.query)
+        clearGoogleMapMarkers()
     }
 
     self.addAllMarkers = function(clickedObject){
-        console.log(clickedObject)
-        console.log(markers())
-        markers().forEach(function(marker){
-            createGoogleMapMarker(map, marker);
-            // self.markerList.push(marker);
-        });
+        console.log("In development.")
+        // self.googleMarkers().forEach(function(marker){
+        //     marker.setMap(null);
+        //     // self.markerList.push(marker);
+        // });
     };
 
-    self.activeMarker = ko.observable(this.markerList()[0]);
+    self.activeMarker = ko.observable(this.googleMarkers()[0]);
 
     self.toggleActive = function(clickedMarker){
         markerClick(clickedMarker)
@@ -116,30 +132,45 @@ function initMap() {
         zoom: 10
     });
     map.setCenter({lat:0, lng:0})
-    //Takes the array of addresses and makes them markers that Google Maps can read
-    // markers.forEach(function(marker){
-    //     createGoogleMapMarker(map, marker)
-    // })
 };
 
+var googleAPIMarkers = []
+
 function createGoogleMapMarker(map, addressmarker){
-    // geocoder = new google.maps.Geocoder();
-    // geocoder.geocode( { 'address': addressmarker.name}, function(results, status) {
-    //   if (status == 'OK') {
-    //     map.setCenter(results[0].geometry.location);
-    // console.log("test")
     var marker = new google.maps.Marker({
-        map: map,
-        position: addressmarker.LatLng,
-        animation: google.maps.Animation.DROP,
-        addresstitle: addressmarker.name,
-        InfoWindow: new google.maps.InfoWindow({
-            content: addressmarker.name
+            map: map,
+            position: addressmarker.position,
+            animation: google.maps.Animation.DROP,
+            addresstitle: addressmarker.name,
+            InfoWindow: new google.maps.InfoWindow({
+                content: addressmarker.name
+            })
         })
-    })
-    map.setCenter(addressmarker.LatLng);
+    map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
+    googleAPIMarkers.push(marker);
     };
+
+function clearGoogleMapMarkers(){
+    for (var i=0; i<googleAPIMarkers.length; i++){
+        googleAPIMarkers[i].setMap(null);
+    }
+    googleAPIMarkers = []
+}
+
+// function createGoogleMapMarker(map, addressmarker){
+//     var marker = new google.maps.Marker({
+//             map: map,
+//             position: addressmarker.position(),
+//             animation: google.maps.Animation.DROP,
+//             addresstitle: addressmarker.name(),
+//             InfoWindow: new google.maps.InfoWindow({
+//                 content: addressmarker.name()
+//             })
+//         })
+//     map.setCenter(addressmarker.position());
+//     marker.addListener('click', markerClick);
+//     };
 
 function markerClick(clickedMarker) {
         if (this.getAnimation() !== null) {
