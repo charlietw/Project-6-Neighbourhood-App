@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Simple Map</title>
-        <meta name="viewport" content="initial-scale=1.0">
+        <title>Neighbourhood map</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
-        <div id="container">
+        <div id="container-fluid">
         <div class="row">
-            <div class="col-lg-3 blackBackground" id="placesList">
+            <div id="map" class="col-lg-10">
+            </div>
+            <div class="col-lg-2 blackBackground" id="placesList">
                 <h3 id="locationHeader">Select a location:</h3>
                 <div class="dropdown blackBackground">
                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Cuisine
@@ -27,8 +29,7 @@
                     </li>
                 </ul>
             </div>
-            <div id="map" class="col-lg-9">
-            </div>
+
         </div>
 
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjy3D1w466JIWeKUi8nZcT1oH6dBPLt4c&callback=init"
