@@ -8,12 +8,13 @@
 }
 
 #placesList {
-    height: 50%;
+    height: 75%;
+    max-width: 40%;
     border-radius: 25px;
     opacity: 0.8;
-/*    padding-left: 50px;*/
     position: absolute;
-    margin-top: 10%;
+    margin-top: 5%;
+    margin-bottom: 10%;
     margin-left: 2%;
 }
 

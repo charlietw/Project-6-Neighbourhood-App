@@ -13,17 +13,25 @@
             <div id="map" class="col-lg-10">
             </div>
             <div class="col-lg-2 blackBackground" id="placesList">
-                <h3 id="locationHeader">Select a location:</h3>
-                <div class="dropdown blackBackground">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Cuisine
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu" data-bind="foreach: cuisineOptions">
-                        <li>
-                            <a href="#" data-bind="text: $data, click: $parent.testFunc"></a>
-                        </li>
-                    </ul>
+                <div class="row text-center">
+                    <h3 id="locationHeader">Select a location:</h3>
                 </div>
-                <ul data-bind="foreach: googleMarkers">
+                <div class="row">
+                    <div class="col-lg-6 dropdown blackBackground">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter
+                        <span class="caret"></span></button>
+                        <ul class="dropdown-menu" data-bind="foreach: filterOptions">
+                            <li>
+                                <a href="#" data-bind="text: $data, click: $parent.filterList"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 btn btn-warning" data-bind="click: removeFilter">
+                        Clear filter
+                    </div>
+                </div>
+
+                <ul data-bind="foreach: googleMarkersFilter">
                     <li>
                         <span data-bind="text: name, click: $parent.addAllMarkers"></span>
                     </li>

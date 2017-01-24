@@ -12,67 +12,99 @@ var GoogleMarker = function(data){
 
 var ViewModel = function(){
     var self = this;
-    this.cuisineOptions = ko.observableArray(["Indian", "Chinese", "Pizza"])
+
     this.fourSquareCreds = ko.observable( {
-                                            client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
-                                            client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
-                                            version: 20170101,
-                                            query: "chinese"
-                                        });
+                                        client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
+                                        client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
+                                        version: 20170101,
+                                    });
 
-    this.initalCuisine = this.cuisineOptions()[0]
+    // Options that the user can filter by
+    this.filterOptions = ko.observableArray(["Café", "Coffee Shop", "Bank", "Pub",])
 
-    this.foursquareurl = ko.computed(function(){
-                            return "https://api.foursquare.com/v2/venues/search?client_id="+
-                            self.fourSquareCreds().client_id+"&client_secret="+
-                            self.fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+self.fourSquareCreds().query+"&v="+
-                            self.fourSquareCreds().version+"20170101&m=foursquare"
-                        });
+    // Think this is obsolete?
+    this.currentFilter = ko.observable(this.filterOptions()[0])
+
+    // To store the full list
     self.googleMarkers = ko.observableArray([]);
 
-    //Used to be a function - still could be? Retrieves markers for Chinese restaurants near Letchworth.
-    this.fourSquareMarkers = function(cuisine){
+    // To be displayed in the UI
+    self.googleMarkersFilter = ko.observableArray([])
+
+    // Removes responses without a category to prevent errors
+    // and therefore improve user experience
+    this.removeNullCategory = function(markers){
+        var validMarkers = [];
+        for(var i=0; i<markers.length; i++){
+            if (markers[i].categories[0]) {
+                validMarkers.push(markers[i]);
+                //console.log(markers[i].categories[0].shortName);
+            };
+        };
+        return validMarkers;
+    };
+
+    // Filters list of responses by name
+    // and selects that list to be shown by Google Maps
+    this.filterList = function(clickedObject){
+        setGoogleMapMarkers(null);
+        var markers = self.googleMarkers();
+        var filteredMarkers = [];
+        for(var i=0; i<markers.length; i++){
+            if (markers[i].categories[0].shortName == clickedObject){
+                filteredMarkers.push(markers[i]);
+                // Sets the Google Map Marker to be visible
+                // As both arrays were created at same time,
+                // using [i] will work.
+                googleAPIMarkers[i].setMap(map);
+            };
+        };
+        self.googleMarkersFilter(filteredMarkers);
+    };
+
+    // Clears the filter and sets the filter list
+    // back to the original list.
+    this.removeFilter = function(){
+        setGoogleMapMarkers(map);
+        self.googleMarkersFilter(self.googleMarkers())
+    }
+
+    // Retrieves venues from foursquare API and creates Google Map
+    // Markers, optionally filtering the results
+    this.fourSquareMarkers = function(filter){
         url = "https://api.foursquare.com/v2/venues/search?client_id="+
                 self.fourSquareCreds().client_id+"&client_secret="+
-                self.fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+cuisine+"&v="+
+                self.fourSquareCreds().client_secret+"&near=Letchworth,UK&v="+
                 self.fourSquareCreds().version+"20170101&m=foursquare"
         $.getJSON(url, function(data) {
-            for(var i=0; i<10; i++){
-                var response = data.response.venues[i];
+            var venues = self.removeNullCategory(data.response.venues)
+            for(var i=0; i<venues.length; i++){
+                var response = venues[i];
+                // Adds 'position' attribute for Google Maps API
                 response.position = {
                                 lat: response.location.lat,
                                 lng: response.location.lng
                             };
                 self.googleMarkers.push(response);
+                self.googleMarkersFilter.push(response);
+                // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
                 };
-            // $.each(data.response.venues, function(){
-            //     // Adds an attribute for Google Maps to place the position.
-            //     this.position = {
-            //                     lat: this.location.lat,
-            //                     lng: this.location.lng
-            //                 };
-            //     self.googleMarkers.push(this);
-            //     createGoogleMapMarker(map, this);
-            //     });
+            // Error handling
             }).error(function(){
                 $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
                 console.log("Something went wrong with getting the markers from foursquare.")
         });
         };
-    self.fourSquareMarkers(self.initalCuisine);
+
+    self.fourSquareMarkers();
+
 
 
     self.googleMarkers().forEach(function(marker){
             createGoogleMapMarker(map, marker);
         });
 
-    self.testFunc = function(clickedObject){
-        self.fourSquareCreds().query = clickedObject;
-        clearGoogleMapMarkers();
-        self.googleMarkers([]);
-        self.fourSquareMarkers(clickedObject);
-    }
 
     self.addAllMarkers = function(clickedObject){
         console.log("In development.")
@@ -95,7 +127,7 @@ var ViewModel = function(){
 var map, marker, geocoder;
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 10
+        zoom: 15
     });
     map.setCenter({lat:0, lng:0})
 };
@@ -117,11 +149,12 @@ function createGoogleMapMarker(map, addressmarker){
     googleAPIMarkers.push(marker);
     };
 
-function clearGoogleMapMarkers(){
+    // Shows/hides Google Map Markers
+    // depending on if input is null/map
+function setGoogleMapMarkers(state){
     for (var i=0; i<googleAPIMarkers.length; i++){
-        googleAPIMarkers[i].setMap(null);
+        googleAPIMarkers[i].setMap(state);
     }
-    googleAPIMarkers = []
 }
 
 function markerClick(clickedMarker) {
