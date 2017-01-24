@@ -5,9 +5,8 @@ var GoogleMarker = function(data){
     this.position = ko.observable(data.position);
 }
 
-//var markers = ko.observableArray([]);
-
-//var googleMarkers = ko.observableArray([]);
+// To store the markers (global so it can be accessed by Google Maps API)
+var googleMarkers = []
 
 
 var ViewModel = function(){
@@ -21,12 +20,6 @@ var ViewModel = function(){
 
     // Options that the user can filter by
     this.filterOptions = ko.observableArray(["Café", "Coffee Shop", "Bank", "Pub",])
-
-    // Think this is obsolete?
-    this.currentFilter = ko.observable(this.filterOptions()[0])
-
-    // To store the full list
-    self.googleMarkers = ko.observableArray([]);
 
     // To be displayed in the UI
     self.googleMarkersFilter = ko.observableArray([])
@@ -48,17 +41,17 @@ var ViewModel = function(){
     // and selects that list to be shown by Google Maps
     this.filterList = function(clickedObject){
         setGoogleMapMarkers(null);
-        var markers = self.googleMarkers();
+        var markers = googleMarkers;
         var filteredMarkers = [];
         for(var i=0; i<markers.length; i++){
-            if (markers[i].categories[0].shortName == clickedObject){
+            if (markers[i].category == clickedObject){
                 filteredMarkers.push(markers[i]);
                 // Sets the Google Map Marker to be visible
-                // As both arrays were created at same time,
-                // using [i] will work.
-                googleAPIMarkers[i].setMap(map);
+                markers[i].setMap(map);
             };
         };
+        console.log(filteredMarkers);
+        //return filteredMarkers;
         self.googleMarkersFilter(filteredMarkers);
     };
 
@@ -66,7 +59,7 @@ var ViewModel = function(){
     // back to the original list.
     this.removeFilter = function(){
         setGoogleMapMarkers(map);
-        self.googleMarkersFilter(self.googleMarkers())
+        self.googleMarkersFilter(self.googleMarkers)
     }
 
     // Retrieves venues from foursquare API and creates Google Map
@@ -85,10 +78,11 @@ var ViewModel = function(){
                                 lat: response.location.lat,
                                 lng: response.location.lng
                             };
-                self.googleMarkers.push(response);
-                self.googleMarkersFilter.push(response);
+                response.category = response.categories[0].shortName;
+                //self.googleMarkersFilter.push(response);
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
+                console.log(googleMarkers)
                 };
             // Error handling
             }).error(function(){
@@ -101,20 +95,17 @@ var ViewModel = function(){
 
 
 
-    self.googleMarkers().forEach(function(marker){
-            createGoogleMapMarker(map, marker);
-        });
+    // self.googleMarkers.forEach(function(marker){
+    //         createGoogleMapMarker(map, marker);
+    //     });
 
 
     self.addAllMarkers = function(clickedObject){
-        console.log("In development.")
-        // self.googleMarkers().forEach(function(marker){
-        //     marker.setMap(null);
-        //     // self.markerList.push(marker);
-        // });
+        console.log(clickedObject);
+        markerClick(clickedObject);
     };
 
-    self.activeMarker = ko.observable(this.googleMarkers()[0]);
+    self.activeMarker = ko.observable(googleMarkers[0]);
 
     self.toggleActive = function(clickedMarker){
         markerClick(clickedMarker)
@@ -132,39 +123,39 @@ function initMap() {
     map.setCenter({lat:0, lng:0})
 };
 
-var googleAPIMarkers = []
-
 function createGoogleMapMarker(map, addressmarker){
     var marker = new google.maps.Marker({
             map: map,
             position: addressmarker.position,
             animation: google.maps.Animation.DROP,
             addresstitle: addressmarker.name,
+            category: addressmarker.category,
             InfoWindow: new google.maps.InfoWindow({
                 content: addressmarker.name
             })
         })
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
-    googleAPIMarkers.push(marker);
+    googleMarkers.push(marker);
     };
 
     // Shows/hides Google Map Markers
     // depending on if input is null/map
 function setGoogleMapMarkers(state){
-    for (var i=0; i<googleAPIMarkers.length; i++){
-        googleAPIMarkers[i].setMap(state);
+    for (var i=0; i<googleMarkers.length; i++){
+        googleMarkers[i].setMap(state);
     }
 }
 
 function markerClick(clickedMarker) {
         if (this.getAnimation() !== null) {
             this.setAnimation(null);
+            this.InfoWindow.close();
         }
         else {
           this.setAnimation(google.maps.Animation.BOUNCE);
+          this.InfoWindow.open(map, this);
         }
-        this.InfoWindow.open(map, this)
         console.log(this.addresstitle+" has been clicked.")
     }
 
