@@ -8,12 +8,13 @@
 }
 
 #placesList {
-    height: 80%;
+    height: 50%;
     border-radius: 25px;
     opacity: 0.8;
 /*    padding-left: 50px;*/
     position: absolute;
-    margin-top: 5%;
+    margin-top: 10%;
+    margin-left: 2%;
 }
 
 .blackBackground {

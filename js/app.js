@@ -28,7 +28,6 @@ var ViewModel = function(){
                             self.fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+self.fourSquareCreds().query+"&v="+
                             self.fourSquareCreds().version+"20170101&m=foursquare"
                         });
-    console.log(self.foursquareurl())
     self.googleMarkers = ko.observableArray([]);
 
     //Used to be a function - still could be? Retrieves markers for Chinese restaurants near Letchworth.
@@ -38,15 +37,24 @@ var ViewModel = function(){
                 self.fourSquareCreds().client_secret+"&near=Letchworth,UK&query="+cuisine+"&v="+
                 self.fourSquareCreds().version+"20170101&m=foursquare"
         $.getJSON(url, function(data) {
-            $.each(data.response.venues, function(){
-                // Adds an attribute for Google Maps to place the position.
-                this.position = {
-                                lat: this.location.lat,
-                                lng: this.location.lng
+            for(var i=0; i<10; i++){
+                var response = data.response.venues[i];
+                response.position = {
+                                lat: response.location.lat,
+                                lng: response.location.lng
                             };
-                self.googleMarkers.push(this);
-                createGoogleMapMarker(map, this);
-                });
+                self.googleMarkers.push(response);
+                createGoogleMapMarker(map, response);
+                };
+            // $.each(data.response.venues, function(){
+            //     // Adds an attribute for Google Maps to place the position.
+            //     this.position = {
+            //                     lat: this.location.lat,
+            //                     lng: this.location.lng
+            //                 };
+            //     self.googleMarkers.push(this);
+            //     createGoogleMapMarker(map, this);
+            //     });
             }).error(function(){
                 $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
                 console.log("Something went wrong with getting the markers from foursquare.")
@@ -61,8 +69,6 @@ var ViewModel = function(){
 
     self.testFunc = function(clickedObject){
         self.fourSquareCreds().query = clickedObject;
-        // console.log(self.fourSquareCreds().query);
-        // console.log(self.foursquareurl());
         clearGoogleMapMarkers();
         self.googleMarkers([]);
         self.fourSquareMarkers(clickedObject);
