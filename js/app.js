@@ -1,9 +1,9 @@
-// Model variables
-var GoogleMarker = function(data){
-    //console.log(data.name)
-    this.name = ko.observable(data.name);
-    this.position = ko.observable(data.position);
-}
+// // Model variables
+// var GoogleMarker = function(data){
+//     //console.log(data.name)
+//     this.name = ko.observable(data.name);
+//     this.position = ko.observable(data.position);
+// }
 
 // To store the markers (global so it can be accessed by Google Maps API)
 var googleMarkers = []
@@ -92,23 +92,13 @@ var ViewModel = function(){
 
     self.fourSquareMarkers();
 
-
-
-    // self.googleMarkers.forEach(function(marker){
-    //         createGoogleMapMarker(map, marker);
-    //     });
-
-
-    self.addAllMarkers = function(clickedObject){
-        console.log(clickedObject);
-        markerClick(clickedObject);
-    };
-
-    self.activeMarker = ko.observable(googleMarkers[0]);
+    // self.addAllMarkers = function(clickedObject){
+    //     console.log(clickedObject);
+    //     markerClick(clickedObject);
+    // };
 
     self.toggleActive = function(clickedMarker){
-        markerClick(clickedMarker)
-        self.activeMarker(clickedMarker)
+        markerClick(clickedMarker);
     }
 };
 
