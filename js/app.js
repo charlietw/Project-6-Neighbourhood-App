@@ -82,7 +82,6 @@ var ViewModel = function(){
                 //self.googleMarkersFilter.push(response);
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
-                console.log(googleMarkers)
                 };
             // Error handling
             }).error(function(){
