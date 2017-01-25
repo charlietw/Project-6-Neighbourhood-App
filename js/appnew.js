@@ -6,12 +6,14 @@
 // }
 
 // To store the markers (global so it can be accessed by Google Maps API)
-var googleMarkers = []
+///var googleMarkers = [] *NO LONGER NEEDED ************************************
 
 
 var ViewModel = function(){
     var self = this;
 
+    // ** ADD query AS KO OBSERVABLE *******************************************
+    self.query = ko.observable("");
     this.fourSquareCreds = ko.observable( {
                                         client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
                                         client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
@@ -39,7 +41,39 @@ var ViewModel = function(){
 
     // Filters list of responses by name
     // and selects that list to be shown by Google Maps
-    this.filterList = function(clickedObject){
+
+    // ** ADD COMPUTED OBSERVABLE TO RUN FILTER ********************************
+    // http://knockoutjs.com/documentation/computedObservables.html
+    this.filterList = ko.computed(function() {
+      if (!self.query()) {
+          self.googleMarkersFilter().forEach(function(marker) {
+             marker.isVisible(true);  // updates Knockout binding
+             marker.setVisible(true); // Google Maps method
+          });
+
+      } else {
+          var filter = self.query().toLowerCase();
+          self.googleMarkersFilter().forEach(function(marker) {
+
+             // ** USE indexOf TO CHECK IF FILTER MATCHES **********************
+             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
+             var match = marker.addresstitle.toLowerCase().indexOf(filter) !== -1;
+
+             // USE KO visible BINDING TO SET LIST VIEW VISIBILITY *************
+             // http://knockoutjs.com/documentation/visible-binding.html *******
+             marker.isVisible(match);  // updates Knockout binding
+
+             // USE GOOGLE MAPS setVisible METHOD TO SET MARKER VISIBILITY *****
+             //  https://developers.google.com/maps/documentation/javascript/reference (open page and search for setVisible)
+             marker.setVisible(match); // Google Maps method
+          });
+      }
+
+    });
+
+
+    /*
+    function(clickedObject){
         setGoogleMapMarkers(null);
         var markers = googleMarkers;
         var filteredMarkers = [];
@@ -53,9 +87,7 @@ var ViewModel = function(){
         console.log(filteredMarkers);
         //return filteredMarkers;
         self.googleMarkersFilter(filteredMarkers);
-    };
-
-
+    };*/
 
     // Clears the filter and sets the filter list
     // back to the original list.
@@ -100,7 +132,8 @@ var ViewModel = function(){
     // };
 
     self.toggleActive = function(clickedMarker){
-        markerClick(clickedMarker);
+        // **********  ADDED GOOGLE MAPS TRIGGER METHOD ************************
+        google.maps.event.trigger(clickedMarker,'click');
     }
 };
 
@@ -127,7 +160,12 @@ function createGoogleMapMarker(map, addressmarker){
         })
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
-    googleMarkers.push(marker);
+
+    // ADD isVisible PROPERTY **************************************************
+    marker.isVisible= ko.observable(true);
+
+    // PUSH MARKERS TO OBSERVABLE ARRAY ****************************************
+    vm.googleMarkersFilter.push(marker);
     };
 
     // Shows/hides Google Map Markers
@@ -150,7 +188,14 @@ function markerClick(clickedMarker) {
         console.log(this.addresstitle+" has been clicked.")
     }
 
+//  SET vm AS GLOBAL VARIABLE **************************************************
+var vm;
 var init = function(){
     initMap();
-    ko.applyBindings(new ViewModel());
+
+    // INSTANTIATE VIEWMODEL AS GLOBAL OBJECT vm *******************************
+    vm = new ViewModel();
+
+    // APPLY BINDINGS TO GLOBAL INSTANCE OF VIEWMODEL (vm)
+    ko.applyBindings(vm);
     }
