@@ -6,7 +6,7 @@
 // }
 
 // To store the markers (global so it can be accessed by Google Maps API)
-var googleMarkers = []
+//var googleMarkers = []
 
 
 var ViewModel = function(){
@@ -18,11 +18,11 @@ var ViewModel = function(){
                                         version: 20170101,
                                     });
 
-    // Options that the user can filter by
-    this.filterOptions = ko.observableArray(["Café", "Coffee Shop", "Bank", "Pub",])
+    // The text that is input by the user from the page
+    this.textFilter = ko.observable("");
 
     // To be displayed in the UI
-    self.googleMarkersFilter = ko.observableArray([])
+    self.googleMarkersFilter = ko.observableArray([]);
 
     // Removes responses without a category to prevent errors
     // and therefore improve user experience
@@ -37,23 +37,46 @@ var ViewModel = function(){
         return validMarkers;
     };
 
+    this.filterList = ko.computed(function(){
+        // If there is nothing in textFilter (i.e. if the page has just been loaded)
+        if (!self.textFilter()){
+            // Do something
+            self.googleMarkersFilter().forEach(function(marker) {
+                 marker.isVisible(true);  // updates Knockout binding
+                 marker.setVisible(true); // Google Maps method
+                });
+            }
+        else {
+            //Do something else
+            var textFilterLower = self.textFilter().toLowerCase();
+            self.googleMarkersFilter().forEach(function(marker) {
+                 if (marker.addresstitle.toLowerCase().indexOf(textFilterLower) == -1){
+                    marker.isVisible(false);  // updates Knockout binding
+                    marker.setVisible(false); // Google Maps method
+                 }
+                //  marker.isVisible(true);  // updates Knockout binding
+                //  marker.setVisible(true); // Google Maps method
+                // });
+            });
+        }
+    });
     // Filters list of responses by name
     // and selects that list to be shown by Google Maps
-    this.filterList = function(clickedObject){
-        setGoogleMapMarkers(null);
-        var markers = googleMarkers;
-        var filteredMarkers = [];
-        for(var i=0; i<markers.length; i++){
-            if (markers[i].category == clickedObject){
-                filteredMarkers.push(markers[i]);
-                // Sets the Google Map Marker to be visible
-                markers[i].setMap(map);
-            };
-        };
-        console.log(filteredMarkers);
-        //return filteredMarkers;
-        self.googleMarkersFilter(filteredMarkers);
-    };
+    // this.filterList = function(clickedObject){
+    //     setGoogleMapMarkers(null);
+    //     var markers = googleMarkers;
+    //     var filteredMarkers = [];
+    //     for(var i=0; i<markers.length; i++){
+    //         if (markers[i].category == clickedObject){
+    //             filteredMarkers.push(markers[i]);
+    //             // Sets the Google Map Marker to be visible
+    //             markers[i].setMap(map);
+    //         };
+    //     };
+    //     console.log(filteredMarkers);
+    //     //return filteredMarkers;
+    //     self.googleMarkersFilter(filteredMarkers);
+    // };
 
 
 
@@ -100,7 +123,8 @@ var ViewModel = function(){
     // };
 
     self.toggleActive = function(clickedMarker){
-        markerClick(clickedMarker);
+        // Triggers the 'click' event for the clickedMarker
+        google.maps.event.trigger(clickedMarker,'click');
     }
 };
 
@@ -127,7 +151,9 @@ function createGoogleMapMarker(map, addressmarker){
         })
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
-    googleMarkers.push(marker);
+    // Set as ko observable to allow it to be edited later.
+    marker.isVisible = ko.observable(true);
+    globalViewModel.googleMarkersFilter.push(marker);
     };
 
     // Shows/hides Google Map Markers
@@ -150,7 +176,11 @@ function markerClick(clickedMarker) {
         console.log(this.addresstitle+" has been clicked.")
     }
 
+// Defined to be global (and therefore accessible by Google Maps)
+var globalViewModel;
+
 var init = function(){
     initMap();
-    ko.applyBindings(new ViewModel());
+    globalViewModel = new ViewModel();
+    ko.applyBindings(globalViewModel);
     }

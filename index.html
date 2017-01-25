@@ -17,14 +17,8 @@
                     <h3 id="locationHeader">Select a location:</h3>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 dropdown blackBackground">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter
-                        <span class="caret"></span></button>
-                        <ul class="dropdown-menu" data-bind="foreach: filterOptions">
-                            <li>
-                                <a href="#" data-bind="text: $data, click: $parent.filterList"></a>
-                            </li>
-                        </ul>
+                    <div class="col-lg-6 form-group">
+                        <input type="text" class="form-control" data-bind="textInput: textFilter">
                     </div>
                     <div class="col-lg-4 btn btn-warning" data-bind="click: removeFilter">
                         Clear filter
@@ -32,7 +26,8 @@
                 </div>
 
                 <ul data-bind="foreach: googleMarkersFilter">
-                    <li>
+                <!-- Sets property for the li so that visible == isVisible -->
+                    <li data-bind="visible: isVisible">
                         <span data-bind="text: addresstitle, click: $parent.toggleActive"></span>
                     </li>
                 </ul>
