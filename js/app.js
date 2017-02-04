@@ -2,7 +2,7 @@ var ViewModel = function(){
 
     var self = this;
 
-    this.fourSquareCreds = ko.observable( {
+    self.fourSquareCreds = ko.observable( {
                                         client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
                                         client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
                                         version: 20170101,
@@ -16,7 +16,7 @@ var ViewModel = function(){
 
     // Filters list of responses by name
     // and selects that list to be shown by Google Maps
-    this.filterList = ko.computed(function() {
+    self.filterList = ko.computed(function() {
         // If no user input, set all visible
         if (!self.query()) {
             self.googleMarkersFilter().forEach(function(marker) {
@@ -41,7 +41,7 @@ var ViewModel = function(){
 
     // Removes responses without a category to prevent errors
     // and therefore improve user experience
-    this.removeNullCategory = function(markers){
+    self.removeNullCategory = function(markers){
         var validMarkers = [];
         for(var i=0; i<markers.length; i++){
             if (markers[i].categories[0]) {
@@ -52,7 +52,7 @@ var ViewModel = function(){
     };
 
     // Retrieves venues from foursquare API and creates Google Map Markers
-    this.fourSquareMarkers = function(filter){
+    self.fourSquareMarkers = function(filter){
         url = "https://api.foursquare.com/v2/venues/search?client_id="+
                 self.fourSquareCreds().client_id+"&client_secret="+
                 self.fourSquareCreds().client_secret+"&near=Letchworth,UK&v="+
