@@ -12,19 +12,12 @@
 var ViewModel = function(){
     var self = this;
 
-    // ** ADD query AS KO OBSERVABLE *******************************************
     self.query = ko.observable("");
     this.fourSquareCreds = ko.observable( {
                                         client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
                                         client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
                                         version: 20170101,
                                     });
-
-    // Options that the user can filter by
-    this.filterOptions = ko.observableArray(["Café", "Coffee Shop", "Bank", "Pub",])
-
-    // To be displayed in the UI
-    self.googleMarkersFilter = ko.observableArray([])
 
     // Removes responses without a category to prevent errors
     // and therefore improve user experience
@@ -39,34 +32,37 @@ var ViewModel = function(){
         return validMarkers;
     };
 
+    // To be displayed in the UI
+    self.googleMarkersFilter = ko.observableArray([])
+
     // Filters list of responses by name
     // and selects that list to be shown by Google Maps
 
-    // ** ADD COMPUTED OBSERVABLE TO RUN FILTER ********************************
-    // http://knockoutjs.com/documentation/computedObservables.html
+
     this.filterList = ko.computed(function() {
-      if (!self.query()) {
-          self.googleMarkersFilter().forEach(function(marker) {
-             marker.isVisible(true);  // updates Knockout binding
-             marker.setVisible(true); // Google Maps method
+
+        if (!self.query()) {
+            self.googleMarkersFilter().forEach(function(marker) {
+                marker.isVisible(true);  // updates Knockout binding
+                marker.setVisible(true); // Google Maps method
           });
 
       } else {
-          var filter = self.query().toLowerCase();
-          self.googleMarkersFilter().forEach(function(marker) {
+        var filter = self.query().toLowerCase();
+        self.googleMarkersFilter().forEach(function(marker) {
 
-             // ** USE indexOf TO CHECK IF FILTER MATCHES **********************
-             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
-             var match = marker.addresstitle.toLowerCase().indexOf(filter) !== -1;
+            // ** USE indexOf TO CHECK IF FILTER MATCHES **********************
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
+            var match = marker.addresstitle.toLowerCase().indexOf(filter) !== -1;
 
-             // USE KO visible BINDING TO SET LIST VIEW VISIBILITY *************
-             // http://knockoutjs.com/documentation/visible-binding.html *******
-             marker.isVisible(match);  // updates Knockout binding
+            // USE KO visible BINDING TO SET LIST VIEW VISIBILITY *************
+            // http://knockoutjs.com/documentation/visible-binding.html *******
+            marker.isVisible(match);  // updates Knockout binding
 
-             // USE GOOGLE MAPS setVisible METHOD TO SET MARKER VISIBILITY *****
-             //  https://developers.google.com/maps/documentation/javascript/reference (open page and search for setVisible)
-             marker.setVisible(match); // Google Maps method
-          });
+            // USE GOOGLE MAPS setVisible METHOD TO SET MARKER VISIBILITY *****
+            //  https://developers.google.com/maps/documentation/javascript/reference (open page and search for setVisible)
+            marker.setVisible(match); // Google Maps method
+        });
       }
 
     });
