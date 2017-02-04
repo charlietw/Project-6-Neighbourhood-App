@@ -7,4 +7,4 @@ For project 6 of Udacity's Full Stack Nanodegree
 3. The markers will show areas of interest in Letchworth Garden City*.
 4. The list view of the locations can be hidden by clicking on 'Show/hide locations', and filtered by typing in the 'Filter by location' text field.
 
-* All location data provided free of charge by [Foursquare] (https://foursquare.com/)
+*All location data provided free of charge by [Foursquare] (https://foursquare.com/)
