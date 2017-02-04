@@ -43,11 +43,11 @@ var ViewModel = function(){
     // and therefore improve user experience
     self.removeNullCategory = function(markers){
         var validMarkers = [];
-        for(var i=0; i<markers.length; i++){
-            if (markers[i].categories[0]) {
-                validMarkers.push(markers[i]);
-            };
-        };
+        markers.forEach(function(marker){
+            if (marker.categories[0]) {
+                validMarkers.push(marker);
+            }
+        });
         return validMarkers;
     };
 
@@ -58,10 +58,9 @@ var ViewModel = function(){
                 self.fourSquareCreds().client_secret+"&near=Letchworth,UK&v="+
                 self.fourSquareCreds().version+"20170101&m=foursquare"
         $.getJSON(url, function(data) {
-            var venues = self.removeNullCategory(data.response.venues)
-            console.log(venues)
-            for(var i=0; i<venues.length; i++){
-                var response = venues[i];
+            var venues = self.removeNullCategory(data.response.venues);
+            venues.forEach(function(venue){
+                var response = venue;
                 // Adds 'position' attribute for Google Maps API
                 response.position = {
                                 lat: response.location.lat,
@@ -69,15 +68,14 @@ var ViewModel = function(){
                             };
                 response.category = response.categories[0].shortName;
                 response.checkins = response.stats.checkinsCount;
-                //self.googleMarkersFilter.push(response);
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
-                };
+                })
             // Error fallback
             }).error(function(){
                 $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
                 $('#showhide').text("Error - click me!")
-                console.log("Something went wrong with getting the markers from foursquare.")
+                console.log("Something went wrong with getting the markers from Foursquare.")
         });
         };
 
@@ -125,11 +123,11 @@ function createGoogleMapMarker(map, addressmarker){
 
     // Shows/hides Google Map Markers
     // depending on if input is null/map
-function setGoogleMapMarkers(state){
-    for (var i=0; i<googleMarkers.length; i++){
-        googleMarkers[i].setMap(state);
-    }
-}
+// function setGoogleMapMarkers(state){
+//     for (var i=0; i<googleMarkers.length; i++){
+//         googleMarkers[i].setMap(state);
+//     }
+// }
 
 // For when a marker is clicked
 function markerClick(clickedMarker) {
