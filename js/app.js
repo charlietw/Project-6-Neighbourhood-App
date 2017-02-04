@@ -129,7 +129,10 @@ function setGoogleMapMarkers(state){
 
 // For when a marker is clicked
 function markerClick(clickedMarker) {
-
+    vm.googleMarkersFilter().forEach(function(marker){
+        marker.setAnimation(null);
+        marker.InfoWindow.close();
+    });
     if (this.getAnimation() !== null) {
         this.setAnimation(null);
         this.InfoWindow.close();
