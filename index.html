@@ -9,41 +9,38 @@
     </head>
     <body>
         <div id="container-fluid">
-        <div class="row">
-            <div id="map" class="col-lg-10">
+            <div class="row">
+                <div id="map" class="col-lg-12"></div>
             </div>
-            <div class="col-lg-2 blackBackground" id="placesList">
-                <div class="row text-center">
-                    <h3 id="locationHeader">Select a location:</h3>
+            <div class="row">
+                <div class="col-xs-2 col-xs-offset-5">
+                    <button type="button" class="btn btn-default blackBackground" data-bind="textInput: query" data-toggle="collapse" data-target="#placesList">Show/hide locations</button>
                 </div>
-                <div class="row">
-    <!-- ADD KNOCKOUT textInput BINDING FOR FILTER *****************************
-         http://knockoutjs.com/documentation/textinput-binding.html ******** -->
-                <input data-bind="textInput: query" class="blackBackground">
-
-                    <div class="col-lg-6 dropdown blackBackground">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter
-                        <span class="caret"></span></button>
-                        <ul class="dropdown-menu" data-bind="foreach: filterOptions">
-                            <li>
-                                <a href="#" data-bind="text: $data, click: $parent.filterList"></a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-4 btn btn-warning" data-bind="click: removeFilter">
-                        Clear filter
-                    </div>
-                </div>
-
-                <ul data-bind="foreach: googleMarkersFilter">
-    <!-- ADD KNOCKOUT visible BINDING TO SHOW/HIDE LIST VIEW ITEMS  ************
-         http://knockoutjs.com/documentation/visible-binding.html ********** -->
-                    <li data-bind="visible: isVisible">
-                        <span data-bind="text: addresstitle, click: $parent.toggleActive"></span>
-                    </li>
-                </ul>
             </div>
-
+            <div class="row">
+                <div class=" col-xs-12 col-sm-4 blackBackground collapse show" id="placesList">
+                    <div class="row text-center">
+                        <h3 id="locationHeader">Select a location:</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 form-group">
+                                <input type= "text" class="form-control blackBackground" data-bind="textInput: query">
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <h6 id="locationHeader">Location data provided by Foursquare</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12" id="test">
+                            <ul data-bind="foreach: googleMarkersFilter">
+                                <li class="markerItem" data-bind="visible: isVisible, click: $parent.toggleActive">
+                                    <span data-bind="text: addresstitle"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjy3D1w466JIWeKUi8nZcT1oH6dBPLt4c&callback=init"

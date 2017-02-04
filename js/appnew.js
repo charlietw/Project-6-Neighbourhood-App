@@ -1,23 +1,43 @@
-// // Model variables
-// var GoogleMarker = function(data){
-//     //console.log(data.name)
-//     this.name = ko.observable(data.name);
-//     this.position = ko.observable(data.position);
-// }
-
-// To store the markers (global so it can be accessed by Google Maps API)
-///var googleMarkers = [] *NO LONGER NEEDED ************************************
-
-
 var ViewModel = function(){
+
     var self = this;
 
-    self.query = ko.observable("");
     this.fourSquareCreds = ko.observable( {
                                         client_id : '55DJLK0E1BC5LG3WR2GHDHZWXVLQOAROEEUUAD4YQJ45PHO0',
                                         client_secret: 'X2MFOZM01IACH5DLBVOFNZBFZ1LGOVORAAXLNC20YHGKKTQR',
                                         version: 20170101,
                                     });
+
+    // To be displayed in the UI
+    self.googleMarkersFilter = ko.observableArray([])
+
+    // Input from user
+    self.query = ko.observable("");
+
+    // Filters list of responses by name
+    // and selects that list to be shown by Google Maps
+    this.filterList = ko.computed(function() {
+        // If no user input, set all visible
+        if (!self.query()) {
+            self.googleMarkersFilter().forEach(function(marker) {
+                marker.isVisible(true);  // updates Knockout binding
+                marker.setVisible(true); // Google Maps method
+          });
+        }
+        // Otherwise filter
+        else {
+            var filter = self.query().toLowerCase();
+            self.googleMarkersFilter().forEach(function(marker) {
+                // If match evaluates to -1 then the letter isn't present, so...
+                var match = marker.addresstitle.toLowerCase().indexOf(filter) !== -1;
+
+                // ...sets marker to either True or False
+                marker.isVisible(match); // for KO
+                marker.setVisible(match); // for Google Maps
+            });
+      }
+
+    });
 
     // Removes responses without a category to prevent errors
     // and therefore improve user experience
@@ -26,74 +46,12 @@ var ViewModel = function(){
         for(var i=0; i<markers.length; i++){
             if (markers[i].categories[0]) {
                 validMarkers.push(markers[i]);
-                //console.log(markers[i].categories[0].shortName);
             };
         };
         return validMarkers;
     };
 
-    // To be displayed in the UI
-    self.googleMarkersFilter = ko.observableArray([])
-
-    // Filters list of responses by name
-    // and selects that list to be shown by Google Maps
-
-
-    this.filterList = ko.computed(function() {
-
-        if (!self.query()) {
-            self.googleMarkersFilter().forEach(function(marker) {
-                marker.isVisible(true);  // updates Knockout binding
-                marker.setVisible(true); // Google Maps method
-          });
-
-      } else {
-        var filter = self.query().toLowerCase();
-        self.googleMarkersFilter().forEach(function(marker) {
-
-            // ** USE indexOf TO CHECK IF FILTER MATCHES **********************
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
-            var match = marker.addresstitle.toLowerCase().indexOf(filter) !== -1;
-
-            // USE KO visible BINDING TO SET LIST VIEW VISIBILITY *************
-            // http://knockoutjs.com/documentation/visible-binding.html *******
-            marker.isVisible(match);  // updates Knockout binding
-
-            // USE GOOGLE MAPS setVisible METHOD TO SET MARKER VISIBILITY *****
-            //  https://developers.google.com/maps/documentation/javascript/reference (open page and search for setVisible)
-            marker.setVisible(match); // Google Maps method
-        });
-      }
-
-    });
-
-
-    /*
-    function(clickedObject){
-        setGoogleMapMarkers(null);
-        var markers = googleMarkers;
-        var filteredMarkers = [];
-        for(var i=0; i<markers.length; i++){
-            if (markers[i].category == clickedObject){
-                filteredMarkers.push(markers[i]);
-                // Sets the Google Map Marker to be visible
-                markers[i].setMap(map);
-            };
-        };
-        console.log(filteredMarkers);
-        //return filteredMarkers;
-        self.googleMarkersFilter(filteredMarkers);
-    };*/
-
-    // Clears the filter and sets the filter list
-    // back to the original list.
-    this.removeFilter = function(){
-        setGoogleMapMarkers(map);
-        self.googleMarkersFilter(self.googleMarkers)
-    }
-
-    // Retrieves venues from foursquare API and creates Google Map
-    // Markers, optionally filtering the results
+    // Retrieves venues from foursquare API and creates Google Map Markers
     this.fourSquareMarkers = function(filter){
         url = "https://api.foursquare.com/v2/venues/search?client_id="+
                 self.fourSquareCreds().client_id+"&client_secret="+
@@ -113,7 +71,7 @@ var ViewModel = function(){
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
                 };
-            // Error handling
+            // Error fallback
             }).error(function(){
                 $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
                 console.log("Something went wrong with getting the markers from foursquare.")
@@ -122,13 +80,8 @@ var ViewModel = function(){
 
     self.fourSquareMarkers();
 
-    // self.addAllMarkers = function(clickedObject){
-    //     console.log(clickedObject);
-    //     markerClick(clickedObject);
-    // };
-
+    // Toggles Google Marker animation
     self.toggleActive = function(clickedMarker){
-        // **********  ADDED GOOGLE MAPS TRIGGER METHOD ************************
         google.maps.event.trigger(clickedMarker,'click');
     }
 };
