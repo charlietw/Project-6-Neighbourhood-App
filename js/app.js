@@ -112,10 +112,8 @@ function createGoogleMapMarker(map, addressmarker){
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
 
-    // ADD isVisible PROPERTY **************************************************
     marker.isVisible= ko.observable(true);
 
-    // PUSH MARKERS TO OBSERVABLE ARRAY ****************************************
     vm.googleMarkersFilter.push(marker);
     };
 
@@ -139,14 +137,11 @@ function markerClick(clickedMarker) {
         console.log(this.addresstitle+" has been clicked.")
     }
 
-//  SET vm AS GLOBAL VARIABLE **************************************************
 var vm;
 var init = function(){
     initMap();
 
-    // INSTANTIATE VIEWMODEL AS GLOBAL OBJECT vm *******************************
     vm = new ViewModel();
 
-    // APPLY BINDINGS TO GLOBAL INSTANCE OF VIEWMODEL (vm)
     ko.applyBindings(vm);
     }
