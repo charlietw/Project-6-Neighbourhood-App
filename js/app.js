@@ -112,8 +112,10 @@ function createGoogleMapMarker(map, addressmarker){
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
 
+    // Creates a knockout observable which sets visibility
     marker.isVisible= ko.observable(true);
 
+    // Pushes to array in ViewModel
     vm.googleMarkersFilter.push(marker);
     };
 
@@ -125,17 +127,18 @@ function setGoogleMapMarkers(state){
     }
 }
 
+// For when a marker is clicked
 function markerClick(clickedMarker) {
-        if (this.getAnimation() !== null) {
-            this.setAnimation(null);
-            this.InfoWindow.close();
-        }
-        else {
-          this.setAnimation(google.maps.Animation.BOUNCE);
-          this.InfoWindow.open(map, this);
-        }
-        console.log(this.addresstitle+" has been clicked.")
+
+    if (this.getAnimation() !== null) {
+        this.setAnimation(null);
+        this.InfoWindow.close();
     }
+    else {
+      this.setAnimation(google.maps.Animation.BOUNCE);
+      this.InfoWindow.open(map, this);
+    }
+}
 
 var vm;
 var init = function(){
