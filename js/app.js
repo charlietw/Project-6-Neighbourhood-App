@@ -9,7 +9,7 @@ var ViewModel = function(){
                                     });
 
     // To be displayed in the UI
-    self.googleMarkersFilter = ko.observableArray([])
+    self.googleMarkersFilter = ko.observableArray([]);
 
     // Input from user
     self.query = ko.observable("");
@@ -53,10 +53,10 @@ var ViewModel = function(){
 
     // Retrieves venues from foursquare API and creates Google Map Markers
     self.fourSquareMarkers = function(filter){
-        url = "https://api.foursquare.com/v2/venues/search?client_id="+
+        var url = "https://api.foursquare.com/v2/venues/search?client_id="+
                 self.fourSquareCreds().client_id+"&client_secret="+
                 self.fourSquareCreds().client_secret+"&near=Letchworth,UK&v="+
-                self.fourSquareCreds().version+"20170101&m=foursquare"
+                self.fourSquareCreds().version+"20170101&m=foursquare";
         $.getJSON(url, function(data) {
             var venues = self.removeNullCategory(data.response.venues);
             venues.forEach(function(venue){
@@ -70,12 +70,12 @@ var ViewModel = function(){
                 response.checkins = response.stats.checkinsCount;
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
-                })
+                });
             // Error fallback
             }).error(function(){
-                $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
-                $('#showhide').text("Error - click me!")
-                console.log("Something went wrong with getting the markers from Foursquare.")
+                $("#locationHeader").text("Oops! Something went wrong with getting these markers. Open DevTools for more info.");
+                $("#showhide").text("Error - click me!");
+                console.log("Something went wrong with getting the markers from Foursquare.");
         });
         };
 
@@ -84,7 +84,7 @@ var ViewModel = function(){
     // Toggles Google Marker animation
     self.toggleActive = function(clickedMarker){
         google.maps.event.trigger(clickedMarker,'click');
-    }
+    };
 };
 
 
@@ -95,8 +95,8 @@ function initMap() {
         zoom: 15,
         gestureHandling: 'greedy'
     });
-    map.setCenter({lat:0, lng:0})
-};
+    map.setCenter({lat:0, lng:0});
+    };
 
 function createGoogleMapMarker(map, addressmarker){
     var marker = new google.maps.Marker({
@@ -110,7 +110,7 @@ function createGoogleMapMarker(map, addressmarker){
                         addressmarker.category+"<br>Total check-ins: "+
                         addressmarker.checkins
             })
-        })
+        });
     map.setCenter(addressmarker.position);
     marker.addListener('click', markerClick);
 
@@ -152,4 +152,4 @@ var init = function(){
     vm = new ViewModel();
 
     ko.applyBindings(vm);
-    }
+    };
