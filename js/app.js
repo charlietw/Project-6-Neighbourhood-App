@@ -1,3 +1,9 @@
+function raiseError(errorOrigin, line){
+    $("#locationHeader").text("Oops! Something went wrong with " + errorOrigin + ". Open DevTools for more info.");
+    $("#showhide").text("Error - click me!");
+    console.log("Something went wrong with " + errorOrigin + ". Line "+ line);
+}
+
 var ViewModel = function(){
 
     var self = this;
@@ -73,9 +79,7 @@ var ViewModel = function(){
                 });
             // Error fallback
             }).error(function(){
-                $("#locationHeader").text("Oops! Something went wrong with getting these markers. Open DevTools for more info.");
-                $("#showhide").text("Error - click me!");
-                console.log("Something went wrong with getting the markers from Foursquare.");
+                raiseError("Foursquare", 82)
         });
         };
 
@@ -89,7 +93,7 @@ var ViewModel = function(){
 
 
 //Handling Google Maps API seprately as per the rubric.
-var map, marker, geocoder;
+var map
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 15,
@@ -97,6 +101,10 @@ function initMap() {
     });
     map.setCenter({lat:0, lng:0});
     };
+
+function googleError(){
+    $("#showhide").text("Error - click me!");
+}
 
 function createGoogleMapMarker(map, addressmarker){
     var marker = new google.maps.Marker({
