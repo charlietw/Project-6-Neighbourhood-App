@@ -74,6 +74,7 @@ var ViewModel = function(){
             // Error fallback
             }).error(function(){
                 $('#locationHeader').text("Oops! Something went wrong with getting these markers. Open DevTools for more info.")
+                $('#showhide').text("Error - click me!")
                 console.log("Something went wrong with getting the markers from foursquare.")
         });
         };
