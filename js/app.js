@@ -59,6 +59,7 @@ var ViewModel = function(){
                 self.fourSquareCreds().version+"20170101&m=foursquare"
         $.getJSON(url, function(data) {
             var venues = self.removeNullCategory(data.response.venues)
+            console.log(venues)
             for(var i=0; i<venues.length; i++){
                 var response = venues[i];
                 // Adds 'position' attribute for Google Maps API
@@ -67,6 +68,7 @@ var ViewModel = function(){
                                 lng: response.location.lng
                             };
                 response.category = response.categories[0].shortName;
+                response.checkins = response.stats.checkinsCount;
                 //self.googleMarkersFilter.push(response);
                 // Converts to Google Map Marker
                 createGoogleMapMarker(map, response);
@@ -106,7 +108,9 @@ function createGoogleMapMarker(map, addressmarker){
             addresstitle: addressmarker.name,
             category: addressmarker.category,
             InfoWindow: new google.maps.InfoWindow({
-                content: addressmarker.name
+                content: "<h5>"+addressmarker.name+"</h5><br>Category: "+
+                        addressmarker.category+"<br>Total check-ins: "+
+                        addressmarker.checkins
             })
         })
     map.setCenter(addressmarker.position);
