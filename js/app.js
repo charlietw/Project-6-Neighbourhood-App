@@ -91,7 +91,8 @@ var ViewModel = function(){
 var map, marker, geocoder;
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15
+        zoom: 15,
+        gestureHandling: 'greedy'
     });
     map.setCenter({lat:0, lng:0})
 };
